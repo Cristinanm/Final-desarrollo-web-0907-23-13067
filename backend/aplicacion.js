@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import session from 'express-session';
 import bcrypt from 'bcryptjs';
 import { Op, Transaction } from 'sequelize';
@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { crearModelos, AlmacenSesiones } from './modelos.js';
 
 export const INACTIVIDAD = 30 * 60 * 1000;
-const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const directorioFrontend = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../frontend');
 const manejar = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 export async function crearAplicacion({ archivo = ':memory:', secreto = randomBytes(48).toString('hex'), reloj = Date.now, cookieSegura = false } = {}) {
   const modelos = crearModelos(archivo);
@@ -124,9 +124,9 @@ export async function crearAplicacion({ archivo = ':memory:', secreto = randomBy
     res.status(201).json(reserva);
   }));
   app.use('/api', (req, res) => res.status(404).json({ mensaje: 'Ruta no encontrada.' }));
-  if (existsSync(path.join(raiz, 'dist/index.html'))) {
-    app.use(express.static(path.join(raiz, 'dist')));
-    app.get('*', (req, res) => res.sendFile(path.join(raiz, 'dist/index.html')));
+  if (existsSync(path.join(directorioFrontend, 'dist/index.html'))) {
+    app.use(express.static(path.join(directorioFrontend, 'dist')));
+    app.get('*', (req, res) => res.sendFile(path.join(directorioFrontend, 'dist/index.html')));
   }
   app.use((error, req, res, next) => {
     if (error.message.includes('HORARIO_SOLAPADO') || error.original?.message?.includes('HORARIO_SOLAPADO')) {

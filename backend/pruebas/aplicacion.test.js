@@ -1,10 +1,10 @@
-﻿import { test } from 'node:test';
+import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { crearAplicacion, INACTIVIDAD } from '../servidor/aplicacion.js';
+import { crearAplicacion, INACTIVIDAD } from '../aplicacion.js';
 
 test('Flujo de autenticación, reglas de reserva y expiración real por inactividad', async () => {
   let ahora = Date.now();

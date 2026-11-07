@@ -1,4 +1,4 @@
-﻿# Decisiones
+# Decisiones
 Carnet: **0907-23-13067**
 
 Este documento describe las decisiones y el trabajo de IA realmente realizado en esta sesión. El estudiante debe revisarlo y poder explicar el resultado antes de entregarlo.
@@ -33,3 +33,6 @@ La explicación del estudiante debe abarcar especialmente la condición de solap
 **Corrección:** se reescribió package.json como UTF-8 sin BOM utilizando System.IO.File.WriteAllText y UTF8Encoding(false). Después se volvió a ejecutar la compilación para verificar la corrección.
 
 **Aprendizaje:** un archivo generado puede parecer válido a simple vista y fallar al procesarse con otra herramienta. Hay que ejecutar las verificaciones de cada parte y documentar el error observado, sin inventar una supuesta corrección para cumplir la rúbrica.
+
+## Ajuste de organización solicitado
+Se separó explícitamente el proyecto en backend/ y frontend/, cada uno con su propio package.json y comandos. La raíz coordina ambos mediante npm workspaces. El backend resuelve su .env y la base de datos con rutas relativas a su archivo de inicio; por eso conserva los mismos datos al ejecutarse desde la raíz o desde backend/. El frontend contiene su HTML, configuración Vite, código React y compilación.

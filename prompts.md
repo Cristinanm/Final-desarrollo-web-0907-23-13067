@@ -1,4 +1,4 @@
-﻿# Registro de prompts
+# Registro de prompts
 Carnet: **0907-23-13067**
 
 ## Solicitud del usuario
@@ -23,3 +23,8 @@ npm.cmd run build
 ~~~
 
 El error de compilación y su corrección real se explican en decisiones.md. Si el estudiante realiza nuevas consultas a IA, debe agregarlas aquí con su texto y el uso que dio a las respuestas.
+
+## Solicitud posterior de organización
+> Recuerda que ne4cesito que este separado el frontend y en backend en carpetas y no lo veo asi
+
+Se reorganizó la aplicación en frontend/ y backend/, se separaron sus dependencias y comandos y se ajustaron las rutas y documentación.

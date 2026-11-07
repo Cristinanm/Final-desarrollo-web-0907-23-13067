@@ -1,8 +1,53 @@
-﻿# Reserva de salas de biblioteca
+# Reserva de salas de biblioteca
 **Carnet: 0907-23-13067**  
 Proyecto: Final-desarrollo-web-0907-23-13067
 
 Aplicación en español con Node.js, Express, Sequelize, SQLite, React y sesiones mediante cookies. No utiliza JWT ni almacena credenciales en localStorage.
+
+## Carpetas separadas
+
+~~~text
+Final-desarrollo-web-0907-23-13067/
+|-- backend/
+|   |-- package.json          # Dependencias y comandos del servidor
+|   |-- .env.example
+|   |-- iniciar.js
+|   |-- aplicacion.js
+|   |-- modelos.js
+|   |-- pruebas/
+|   +-- datos/                # SQLite; excluido de Git
+|-- frontend/
+|   |-- package.json          # Dependencias y comandos de React
+|   |-- index.html
+|   |-- vite.config.js
+|   |-- src/
+|   |   |-- principal.jsx
+|   |   +-- estilos.css
+|   +-- dist/                 # Compilación; excluida de Git
+|-- package.json              # Comandos conjuntos y workspaces
+|-- package-lock.json
+|-- README.md
+|-- decisiones.md
++-- prompts.md
+~~~
+
+Backend y frontend tienen sus propios package.json. npm workspaces permite instalar todas las dependencias una vez desde la raíz; npm puede compartirlas físicamente en node_modules sin mezclar el código de las dos aplicaciones.
+
+Para ejecutar cada parte por separado, después de npm.cmd install en la raíz:
+
+**Terminal 1 — backend**
+~~~powershell
+cd backend
+npm.cmd run dev
+~~~
+
+**Terminal 2 — frontend**
+~~~powershell
+cd frontend
+npm.cmd run dev
+~~~
+
+Abre la URL de Vite. El frontend llama a /api mediante el proxy del servidor de desarrollo. Para ejecutar la versión compilada, los comandos build y start de la raíz siguen funcionando: Node sirve frontend/dist y la API.
 
 ## Requisitos
 - Node.js 22 o posterior y npm.
@@ -14,12 +59,12 @@ Desde la carpeta del proyecto:
 
 ~~~powershell
 npm.cmd install
-Copy-Item .env.example .env
+Copy-Item backend/.env.example backend/.env
 npm.cmd run build
 npm.cmd start
 ~~~
 
-Abre **http://localhost:3000**. Edita .env para elegir tu propio SECRETO_SESION. En otros sistemas puedes usar npm en lugar de npm.cmd; en Windows el sufijo evita el bloqueo de npm.ps1 por la política de PowerShell.
+Abre **http://localhost:3000**. Edita backend/.env para elegir tu propio SECRETO_SESION. En otros sistemas puedes usar npm en lugar de npm.cmd; en Windows el sufijo evita el bloqueo de npm.ps1 por la política de PowerShell.
 
 No hay contraseñas de demostración: usa **Crear una cuenta**. Al registrarte se inicia la sesión. Se crean tres salas automáticamente, sin duplicarlas al reiniciar.
 
@@ -29,7 +74,7 @@ Para desarrollar con recarga automática:
 npm.cmd run dev
 ~~~
 
-Abre la dirección que imprime Vite (normalmente http://127.0.0.1:5173). Vite redirige /api al backend del puerto 3000. Para cambiar este puerto en desarrollo también debes ajustar el proxy en vite.config.js.
+Abre la dirección que imprime Vite (normalmente http://127.0.0.1:5173). Vite redirige /api al backend del puerto 3000. Para cambiar este puerto en desarrollo también debes ajustar el proxy en frontend/vite.config.js.
 
 ## Comprobar
 ~~~powershell
@@ -56,7 +101,7 @@ La compilación comprueba el frontend. La navegación visual y la redirección e
 | reservas | id, usuario_id, sala_id, fecha, hora_inicio, hora_fin | Pertenece a un usuario y a una sala |
 | sesiones | id, datos, vence | Sesión del servidor; sin relación de negocio adicional |
 
-Los modelos y sus propiedades se escriben en español. La base usa nombres de tablas en minúscula y columnas con guion bajo. Sequelize crea la estructura al arrancar. datos/biblioteca.sqlite persiste usuarios, salas, reservas y sesiones; está excluido de Git.
+Los modelos y sus propiedades se escriben en español. La base usa nombres de tablas en minúscula y columnas con guion bajo. Sequelize crea la estructura al arrancar. backend/datos/biblioteca.sqlite persiste usuarios, salas, reservas y sesiones; está excluido de Git.
 
 La capacidad indica cuántas personas caben en la sala. No es una cantidad de reservas simultáneas: cada sala se reserva completa.
 
@@ -107,12 +152,12 @@ Registro recibe nombre, correo, contrasena. Login recibe correo, contrasena. Res
 8. Usar otro usuario para comprobar que no ve reservas ajenas y tampoco puede ocupar un horario ya reservado.
 
 ## Archivos para estudiar
-- servidor/modelos.js: tablas, relaciones y almacén de sesiones.
-- servidor/aplicacion.js: rutas, validaciones y regla de negocio.
-- servidor/iniciar.js: configuración e inicio.
-- cliente/principal.jsx: formularios, listado, estado y manejo del 401.
-- cliente/estilos.css: diseño adaptable a móvil.
-- pruebas/aplicacion.test.js: integración del flujo completo.
+- backend/modelos.js: tablas, relaciones y almacén de sesiones.
+- backend/aplicacion.js: rutas, validaciones y regla de negocio.
+- backend/iniciar.js: configuración e inicio.
+- frontend/src/principal.jsx: formularios, listado, estado y manejo del 401.
+- frontend/src/estilos.css: diseño adaptable a móvil.
+- backend/pruebas/aplicacion.test.js: integración del flujo completo.
 - decisiones.md: decisiones, uso de IA y corrección comprobada.
 - prompts.md: solicitud y registro de instrucciones utilizadas.
 
