@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
+import bcrypt from 'bcryptjs';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -13,14 +14,20 @@ test('Flujo de autenticación, reglas de reserva y expiración real por inactivi
   const agente = request.agent(sistema.app);
   try {
     await request(sistema.app).get('/api/salas').expect(401);
-    const registro = await agente.post('/api/registro').send({ nombre: 'Ana López', correo: 'ana@ejemplo.com', contrasena: 'Biblioteca123!' }).expect(201);
-    assert.equal(registro.body.usuario.nombre, 'Ana López');
-    assert.equal(registro.body.usuario.hashContrasena, undefined);
-    const usuario = await sistema.Usuario.findOne();
-    assert.notEqual(usuario.hashContrasena, 'Biblioteca123!');
-    assert.match(registro.headers['set-cookie'][0], /HttpOnly/);
-    assert.match(registro.headers['set-cookie'][0], /SameSite=Strict/);
-    const token = registro.body.tokenCsrf;
+    // Usuarios existentes: los datos de prueba se crean directamente en la BD temporal.
+    const hashContrasena = await bcrypt.hash('Biblioteca123!', 12);
+    await sistema.Usuario.bulkCreate([
+      { nombre: 'Ana López', correo: 'ana@ejemplo.com', hashContrasena },
+      { nombre: 'Luis', correo: 'luis@ejemplo.com', hashContrasena }
+    ]);
+    await request(sistema.app).post('/api/registro').send({ nombre: 'Nuevo', correo: 'nuevo@ejemplo.com', contrasena: 'Biblioteca123!' }).expect(404);
+    assert.equal(await sistema.Usuario.count(), 2);
+    const acceso = await agente.post('/api/login').send({ correo: 'ana@ejemplo.com', contrasena: 'Biblioteca123!' }).expect(200);
+    assert.equal(acceso.body.usuario.nombre, 'Ana López');
+    assert.equal(acceso.body.usuario.hashContrasena, undefined);
+    assert.match(acceso.headers['set-cookie'][0], /HttpOnly/);
+    assert.match(acceso.headers['set-cookie'][0], /SameSite=Strict/);
+    const token = acceso.body.tokenCsrf;
     const salas = await agente.get('/api/salas').expect(200);
     const reserva = { salaId: salas.body[0].id, fecha: '2027-02-18', horaInicio: '09:00', horaFin: '10:00' };
     await agente.post('/api/reservas').send(reserva).expect(403);
@@ -37,7 +44,7 @@ test('Flujo de autenticación, reglas de reserva y expiración real por inactivi
     await reservar({ ...reserva, salaId: 99999 }).expect(404);
     // Segundo usuario: los conflictos se comprueban para todos, los listados son privados.
     const otro = request.agent(sistema.app);
-    const sesionOtro = await otro.post('/api/registro').send({ nombre: 'Luis', correo: 'luis@ejemplo.com', contrasena: 'Biblioteca123!' }).expect(201);
+    const sesionOtro = await otro.post('/api/login').send({ correo: 'luis@ejemplo.com', contrasena: 'Biblioteca123!' }).expect(200);
     await otro.post('/api/reservas').set('X-Token-CSRF', sesionOtro.body.tokenCsrf).send(reserva).expect(409);
     assert.deepEqual((await otro.get('/api/reservas').expect(200)).body, []);
     // Dos solicitudes simultáneas: solamente una puede ganar.

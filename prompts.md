@@ -28,3 +28,6 @@ El error de compilación y su corrección real se explican en decisiones.md. Si 
 > Recuerda que ne4cesito que este separado el frontend y en backend en carpetas y no lo veo asi
 
 Se reorganizó la aplicación en frontend/ y backend/, se separaron sus dependencias y comandos y se ajustaron las rutas y documentación.
+
+## Solicitud de simplificación
+El usuario pidió un frontend más sencillo, conservar el verde, eliminar imágenes y elementos decorativos y permitir solamente login con los dos usuarios que ya había guardado. Se simplificaron los estilos y componentes y se eliminó el registro público sin modificar sus datos.

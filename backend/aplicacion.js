@@ -67,16 +67,6 @@ export async function crearAplicacion({ archivo = ':memory:', secreto = randomBy
     await new Promise((resolve, reject) => req.session.save(error => error ? reject(error) : resolve()));
     return { usuario: vistaUsuario(usuario), tokenCsrf: req.session.tokenCsrf };
   };
-  app.post('/api/registro', manejar(async (req, res) => {
-    const { nombre, correo, contrasena } = req.body;
-    if (typeof nombre !== 'string' || !nombre.trim() || nombre.trim().length > 100 ||
-      typeof correo !== 'string' || correo.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim()) ||
-      typeof contrasena !== 'string' || contrasena.length < 8 || Buffer.byteLength(contrasena) > 72) {
-      return res.status(400).json({ mensaje: 'Ingresa nombre, correo válido y contraseña de 8 a 72 bytes.' });
-    }
-    const usuario = await Usuario.create({ nombre: nombre.trim(), correo: correo.trim().toLowerCase(), hashContrasena: await bcrypt.hash(contrasena, 12) });
-    res.status(201).json(await iniciarSesion(req, usuario));
-  }));
   app.post('/api/login', manejar(async (req, res) => {
     const { correo, contrasena } = req.body;
     if (typeof correo !== 'string' || typeof contrasena !== 'string' || Buffer.byteLength(contrasena) > 72) {

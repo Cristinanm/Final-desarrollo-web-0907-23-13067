@@ -36,3 +36,6 @@ La explicación del estudiante debe abarcar especialmente la condición de solap
 
 ## Ajuste de organización solicitado
 Se separó explícitamente el proyecto en backend/ y frontend/, cada uno con su propio package.json y comandos. La raíz coordina ambos mediante npm workspaces. El backend resuelve su .env y la base de datos con rutas relativas a su archivo de inicio; por eso conserva los mismos datos al ejecutarse desde la raíz o desde backend/. El frontend contiene su HTML, configuración Vite, código React y compilación.
+
+## Simplificación solicitada
+Se sustituyó el diseño decorativo por formularios y tablas con estilos básicos en verde. Se eliminaron las ilustraciones y fuentes externas, el formulario de registro y la ruta pública de creación de usuarios. El login sigue verificando las contraseñas con bcrypt contra los usuarios ya guardados. No se cambió ni se recreó la base de datos existente. Las pruebas preparan los usuarios directamente en su base temporal y comprueban que el registro público responde 404.

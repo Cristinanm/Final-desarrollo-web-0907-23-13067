@@ -66,7 +66,7 @@ npm.cmd start
 
 Abre **http://localhost:3000**. Edita backend/.env para elegir tu propio SECRETO_SESION. En otros sistemas puedes usar npm en lugar de npm.cmd; en Windows el sufijo evita el bloqueo de npm.ps1 por la política de PowerShell.
 
-No hay contraseñas de demostración: usa **Crear una cuenta**. Al registrarte se inicia la sesión. Se crean tres salas automáticamente, sin duplicarlas al reiniciar.
+Inicia sesión con el correo y la contraseña de un usuario que ya exista en la base de datos. No hay registro público ni cuentas de demostración. Los usuarios existentes se conservan. Se crean tres salas automáticamente, sin duplicarlas al reiniciar.
 
 Para desarrollar con recarga automática:
 
@@ -83,7 +83,7 @@ npm.cmd run build
 ~~~
 
 Las pruebas de integración usan una base temporal y comprueban:
-- Rutas protegidas, registro, hash de contraseña, login, logout y cookie HttpOnly/SameSite.
+- Rutas protegidas, login de usuarios existentes, registro público deshabilitado, logout y cookie HttpOnly/SameSite.
 - Token CSRF y respuestas 400, 401, 403, 404 y 409.
 - Solapamientos iguales, parciales, contenidos y envolventes.
 - Reservas consecutivas, otras salas y otras fechas.
@@ -131,7 +131,6 @@ El backend consulta dentro de una transacción SQLite BEGIN IMMEDIATE. Un trigge
 ## Rutas
 | Método | Ruta | Función |
 | --- | --- | --- |
-| POST | /api/registro | Crear usuario e iniciar sesión |
 | POST | /api/login | Iniciar sesión |
 | GET | /api/sesion | Recuperar usuario y token CSRF |
 | POST | /api/logout | Cerrar sesión; requiere token |
@@ -139,11 +138,11 @@ El backend consulta dentro de una transacción SQLite BEGIN IMMEDIATE. Un trigge
 | GET | /api/reservas | Listar reservas del usuario actual |
 | POST | /api/reservas | Crear reserva; requiere sesión y token |
 
-Registro recibe nombre, correo, contrasena. Login recibe correo, contrasena. Reserva recibe salaId (entero), fecha (AAAA-MM-DD), horaInicio y horaFin (HH:mm). El usuario se toma de la sesión; el cliente no puede reservar a nombre de otra persona.
+Login recibe correo, contrasena. Reserva recibe salaId (entero), fecha (AAAA-MM-DD), horaInicio y horaFin (HH:mm). El usuario se toma de la sesión; el cliente no puede reservar a nombre de otra persona.
 
 ## Recorrido manual para la defensa
-1. Crear una cuenta; seleccionar sala, fecha y horario; confirmar.
-2. Abrir **Mis reservas** y comprobar sala, fecha y horas.
+1. Iniciar sesión con un usuario existente; seleccionar sala, fecha y horario; guardar.
+2. Revisar la tabla **Mis reservas** y comprobar sala, fecha y horas.
 3. Repetir la misma reserva: debe aparecer el mensaje de horario ocupado.
 4. Reservar justo al terminar la primera: debe aceptarse.
 5. Cerrar sesión e intentar entrar de nuevo con contraseña incorrecta.
@@ -177,3 +176,6 @@ git push -u origin main
 ~~~
 
 Entrega en Canvas el enlace a ese repositorio. No subas .env, node_modules, dist ni la base de datos. package-lock.json sí debe subirse. Antes de entregar, revisa los documentos y asegúrate de poder explicar el código: la rúbrica da mayor peso a la comprensión que a la apariencia.
+
+## Interfaz simplificada
+El frontend utiliza Arial, detalles verdes, formularios y tablas sencillas, sin imágenes, ilustraciones, iconos ni fuentes externas. El único acceso es el login con usuarios existentes. La ruta de registro también se eliminó del backend. Las pruebas crean sus usuarios exclusivamente en una base temporal; no modifican la base del estudiante. Las contraseñas guardadas deben ser hashes bcrypt, como exige el modelo original.
