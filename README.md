@@ -150,32 +150,3 @@ Login recibe correo, contrasena. Reserva recibe salaId (entero), fecha (AAAA-MM-
 7. Dejar de interactuar durante 30 minutos y realizar una acción: debe mostrar el login. La prueba automatizada comprueba el mismo plazo sin esperar media hora.
 8. Usar otro usuario para comprobar que no ve reservas ajenas y tampoco puede ocupar un horario ya reservado.
 
-## Archivos para estudiar
-- backend/modelos.js: tablas, relaciones y almacén de sesiones.
-- backend/aplicacion.js: rutas, validaciones y regla de negocio.
-- backend/iniciar.js: configuración e inicio.
-- frontend/src/principal.jsx: formularios, listado, estado y manejo del 401.
-- frontend/src/estilos.css: diseño adaptable a móvil.
-- backend/pruebas/aplicacion.test.js: integración del flujo completo.
-- decisiones.md: decisiones, uso de IA y corrección comprobada.
-- prompts.md: solicitud y registro de instrucciones utilizadas.
-
-## Entrega del repositorio
-Se incluyen commits separados de backend y frontend. Revisa el historial con:
-
-~~~powershell
-git log --oneline
-~~~
-
-Para subirlo a tu repositorio de GitHub, crea primero un repositorio vacío y ejecuta, sustituyendo TU_USUARIO:
-
-~~~powershell
-git branch -M main
-git remote add origin https://github.com/TU_USUARIO/Final-desarrollo-web-0907-23-13067.git
-git push -u origin main
-~~~
-
-Entrega en Canvas el enlace a ese repositorio. No subas .env, node_modules, dist ni la base de datos. package-lock.json sí debe subirse. Antes de entregar, revisa los documentos y asegúrate de poder explicar el código: la rúbrica da mayor peso a la comprensión que a la apariencia.
-
-## Interfaz simplificada
-El frontend utiliza Arial, detalles verdes, formularios y tablas sencillas, sin imágenes, ilustraciones, iconos ni fuentes externas. El único acceso es el login con usuarios existentes. La ruta de registro también se eliminó del backend. Las pruebas crean sus usuarios exclusivamente en una base temporal; no modifican la base del estudiante. Las contraseñas guardadas deben ser hashes bcrypt, como exige el modelo original.

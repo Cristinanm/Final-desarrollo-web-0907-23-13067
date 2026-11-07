@@ -1,41 +1,55 @@
 # Decisiones
-Carnet: **0907-23-13067**
+**Carné: 0907-23-13067**
 
-Este documento describe las decisiones y el trabajo de IA realmente realizado en esta sesión. El estudiante debe revisarlo y poder explicar el resultado antes de entregarlo.
+## (a) Qué entendí del problema y qué modelos utilicé
 
-## (a) Qué se entendió del problema y qué tablas/modelos se planearon
-Se necesita una aplicación web para reservar salas completas de una biblioteca. Cada reserva pertenece a un usuario y una sala, en una fecha y un intervalo de horas. Dos usuarios no pueden reservar la misma sala en horarios que se superpongan. La sesión debe expirar después de 30 minutos de inactividad; el frontend debe mostrar el login al recibir 401.
+Entendí que debía crear una aplicación web para reservar salas de una biblioteca. Cada reserva debe indicar el usuario, la sala, la fecha y las horas de inicio y fin. Una misma sala no puede tener reservas con horarios que se crucen, aunque sean de distintos usuarios.
 
-Se eligieron Node.js y Express para el backend, Sequelize como ORM, SQLite como base de datos y React básico para la interfaz. SQLite permite ejecutar el proyecto sin configurar un servidor externo de base de datos.
+La sesión debe cerrarse después de 30 minutos de inactividad. Cuando el servidor responda con un error 401, la aplicación debe mostrar nuevamente el inicio de sesión.
 
-Modelos:
-- **Usuario:** id, nombre, correo único y hash de contraseña.
-- **Sala:** id, nombre único y capacidad positiva.
-- **Reserva:** id, usuario, sala, fecha, hora de inicio y hora de fin.
-- **Sesion:** identificador, datos de sesión y vencimiento. Esta tabla adicional permite persistir sesiones sin usar el almacén temporal en memoria.
+Utilicé Node.js y Express para el backend, Sequelize para trabajar con los modelos y React para la interfaz. Elegí SQLite porque permite guardar los datos en un archivo sin instalar un servidor de base de datos.
 
-Usuario y Sala tienen una relación de uno a muchos con Reserva. El usuario de una reserva proviene de la sesión, nunca de un campo editable del formulario. La consulta del listado devuelve solamente las reservas del usuario actual.
+Los modelos que utilicé fueron:
 
-La regla usa comparaciones estrictas para admitir horarios consecutivos. La transacción y el trigger SQLite evitan que dos solicitudes concurrentes creen reservas incompatibles.
+- **Usuario:** guarda el identificador, nombre, correo único y hash de la contraseña.
+- **Sala:** guarda el identificador, nombre único y capacidad.
+- **Reserva:** guarda el identificador, usuario, sala, fecha y horas de inicio y fin.
+- **Sesión:** guarda el identificador, los datos de la sesión y su vencimiento para conservarla en la base de datos.
 
-## (b) Qué partes se delegaron a la IA y por qué
-Se pidió a la IA construir la aplicación y mantener los nombres y contenido en español. La IA generó el backend, los modelos Sequelize, la persistencia de sesiones, los formularios y listados React, estilos, pruebas automatizadas y borradores de documentación. También instaló las dependencias y ejecutó pruebas y compilación.
+Un usuario puede tener varias reservas y una sala puede aparecer en distintas reservas. El usuario que hace una reserva se obtiene de la sesión iniciada. Además, cada usuario solamente puede consultar sus propias reservas.
 
-Se usó IA para acelerar la construcción y comprobar casos que suelen omitirse: intervalos contenidos o envolventes, horarios adyacentes, concurrencia y renovación de sesión. Esta asistencia no sustituye la revisión del estudiante. No se atribuye al estudiante la escritura manual de código que generó la IA ni se inventan conversaciones adicionales.
+Para evitar cruces de horarios, se comprueba si una reserva existente empieza antes de que termine la nueva y termina después de que comience la nueva. Esto permite reservar, por ejemplo, de 9:00 a 10:00 y de 10:00 a 11:00. También se utilizaron una transacción y una validación automática en SQLite para evitar cruces cuando llegan dos solicitudes al mismo tiempo.
 
-La explicación del estudiante debe abarcar especialmente la condición de solapamiento, por qué pertenece al backend, la diferencia entre cookie y sesión, el hash de contraseña y el manejo del 401 en React.
+## (b) Qué partes delegué a la IA y por qué
 
-## (c) Una cosa que la IA hizo mal, cómo se corrigió y cómo se detectó
-**Fallo real:** al generar package.json con Set-Content -Encoding utf8 en Windows PowerShell, la IA produjo un archivo con marca BOM. Aunque npm pudo instalar dependencias, la primera compilación de Vite falló al buscar la configuración de PostCSS, con el error Unexpected token al leer el JSON.
+Le pedí a la IA que me ayudara a construir la aplicación y que mantuviera los nombres y el contenido en español. La IA generó el código del backend, los modelos, el manejo de sesiones, los formularios y las tablas de React, los estilos, las pruebas y los borradores de la documentación. También realizó la instalación de dependencias y ejecutó las pruebas y la compilación.
 
-**Detección:** se ejecutó npm.cmd run build; su salida señaló el carácter inicial de package.json. La prueba del backend había pasado, por lo que se comprobó que esa prueba no bastaba para validar el frontend.
+Utilicé esta ayuda para avanzar en la construcción y revisar situaciones que podía pasar por alto, como reservas que se cruzan, horarios consecutivos, solicitudes simultáneas y renovación de la sesión.
 
-**Corrección:** se reescribió package.json como UTF-8 sin BOM utilizando System.IO.File.WriteAllText y UTF8Encoding(false). Después se volvió a ejecutar la compilación para verificar la corrección.
+Reconozco que la IA generó esas partes del código. Mi responsabilidad es revisarlas y comprender cómo funcionan para poder explicarlas. Los puntos principales que debo entender son la validación de horarios en el backend, la diferencia entre una cookie y una sesión, el hash de las contraseñas y la respuesta del frontend ante un error 401.
 
-**Aprendizaje:** un archivo generado puede parecer válido a simple vista y fallar al procesarse con otra herramienta. Hay que ejecutar las verificaciones de cada parte y documentar el error observado, sin inventar una supuesta corrección para cumplir la rúbrica.
+## (c) Qué hizo mal la IA, cómo se detectó y cómo se corrigió
 
-## Ajuste de organización solicitado
-Se separó explícitamente el proyecto en backend/ y frontend/, cada uno con su propio package.json y comandos. La raíz coordina ambos mediante npm workspaces. El backend resuelve su .env y la base de datos con rutas relativas a su archivo de inicio; por eso conserva los mismos datos al ejecutarse desde la raíz o desde backend/. El frontend contiene su HTML, configuración Vite, código React y compilación.
+Uno de los errores de la IA ocurrió al crear el archivo `package.json` con PowerShell. El archivo quedó con una marca invisible al inicio, llamada BOM, que provocó un error al compilar el frontend con Vite.
 
-## Simplificación solicitada
-Se sustituyó el diseño decorativo por formularios y tablas con estilos básicos en verde. Se eliminaron las ilustraciones y fuentes externas, el formulario de registro y la ruta pública de creación de usuarios. El login sigue verificando las contraseñas con bcrypt contra los usuarios ya guardados. No se cambió ni se recreó la base de datos existente. Las pruebas preparan los usuarios directamente en su base temporal y comprueban que el registro público responde 404.
+El problema se detectó al ejecutar `npm.cmd run build`. El mensaje de error indicaba que había un carácter inesperado al leer el archivo JSON. Aunque las pruebas del backend habían pasado, el frontend todavía tenía este problema.
+
+Para corregirlo, se guardó nuevamente el archivo en formato UTF-8 sin BOM, utilizando `System.IO.File.WriteAllText` y `UTF8Encoding(false)`. Después se ejecutó otra vez la compilación para comprobar que el error estuviera solucionado.
+
+Aprendí que un archivo puede verse correcto y aun así contener detalles que impidan su funcionamiento. También comprendí que debo revisar y probar tanto el backend como el frontend.
+
+## Organización del proyecto
+
+Pedí que el proyecto se dividiera en dos carpetas: `backend/` y `frontend/`, cada una con su propio `package.json` y sus comandos. La carpeta principal utiliza npm workspaces para coordinar ambas partes.
+
+El backend busca su archivo `.env` y la base de datos tomando como referencia la ubicación de su archivo de inicio. Así utiliza los mismos datos al ejecutarlo desde la carpeta principal o desde `backend/`.
+
+En `frontend/` quedaron el archivo HTML, la configuración de Vite, el código de React y los archivos generados al compilar.
+
+## Simplificación de la aplicación
+
+Pedí un diseño más sencillo, con formularios, tablas y estilos básicos en color verde. También solicité quitar las ilustraciones, las fuentes externas y el registro público de usuarios.
+
+El inicio de sesión sigue comprobando las contraseñas con bcrypt y permite entrar a los usuarios que ya están guardados. Durante estos cambios se conservó la base de datos existente.
+
+Para las pruebas, los usuarios se crean directamente en una base de datos temporal. También se comprueba que la ruta de registro público responda con un error 404, porque esa opción fue eliminada.
